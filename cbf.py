@@ -207,7 +207,6 @@ class CBF:
         cd["name"] = self.category_name()
         ncols = self.count_columns()
         nrows = self.count_rows()
-        self.rewind_row()
         colnames = []
         coltypes = []
         colvals = []
@@ -220,6 +219,7 @@ class CBF:
         self.rewind_row()
         for r in range(nrows):
             self.select_row(r)
+            self.rewind_column()
             for c in range(ncols):
                 self.select_column(c)
                 val, _ = self.get()
