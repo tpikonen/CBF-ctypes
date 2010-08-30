@@ -538,7 +538,8 @@ class CBF:
         arr = np.zeros(shape, dtype=dtype)
         nelems = np.prod(shape)
         ret = lib.cbf_get_integerarray(self.h, byref(binary_id),
-            arr.ctypes.data, 4, elsigned, c_size_t(nelems), byref(elread))
+            arr.ctypes.get_as_parameter(),
+            4, elsigned, c_size_t(nelems), byref(elread))
         if ret != 0 or elread != nelems:
             raise RuntimeError(ret)
         return arr
@@ -551,7 +552,8 @@ class CBF:
         elread = c_size_t()
         arr = np.zeros(shape, dtype=np.float64)
         nelems = np.prod(shape)
-        ret = lib.cbf_get_realarray(self.h, byref(binary_id), arr.ctypes.data,
+        ret = lib.cbf_get_realarray(self.h, byref(binary_id),
+            arr.ctypes.get_as_parameter(),
             8, nelems, byref(elread))
         if ret != 0 or elread != nelems:
             raise RuntimeError(ret)
