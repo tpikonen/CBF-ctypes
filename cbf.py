@@ -143,7 +143,7 @@ class CBF:
 
 
     def datablock_asdict(self, key=None):
-        """Return datablock as dictionary.
+        """Return the current datablock as dictionary.
 
         If the argument `key` is None, the current datablock is returned.
         If `key` is a string, datablock with that name is returned.
