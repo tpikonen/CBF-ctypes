@@ -79,6 +79,9 @@ c_fopen = ctypes.pythonapi.fopen
 c_fopen.restype = FILE_ptr
 c_fopen.argtypes = [ctypes.c_char_p, ctypes.c_char_p]
 c_fopen.errcheck = io_errcheck
+c_fclose = ctypes.pythonapi.fclose
+c_fclose.restype = ctypes.c_int
+c_fclose.argtypes = [FILE_ptr]
 
 
 class HandleStruct(Structure): pass # cbf_handle_struct
@@ -109,7 +112,7 @@ class CBF:
     """
     def __init__(self, filename=None):
         self.h = Handle()
-        self.FILE = None
+        self.FILEp = None
         ret = lib.cbf_make_handle(byref(self.h))
         if ret != 0:
             raise RuntimeError(ret)
@@ -119,6 +122,7 @@ class CBF:
 
     def __del__(self):
         ret = lib.cbf_free_handle(self.h)
+        # CBFlib closes the FILE*
         if ret != 0:
             raise RuntimeError(ret)
 
@@ -312,9 +316,10 @@ class CBF:
     def read_file(self, filename):
         """Associate an existing file to a CBF instance.
         """
-        cfile_ptr = c_fopen(filename, 'rb')
-        ret =  lib.cbf_read_file(self.h, cfile_ptr, c_int(Headers.MSG_NODIGEST))
+        self.FILEp = c_fopen(filename, 'rb')
+        ret = lib.cbf_read_file(self.h, self.FILEp, c_int(Headers.MSG_NODIGEST))
         if ret != 0:
+            c_fclose(self.FILEp)
             raise RuntimeError(ret)
         self.filename = filename
 
