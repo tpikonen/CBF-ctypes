@@ -53,6 +53,15 @@ def mark_cross(center, **kwargs):
     plt.axvline(x=center[0]-0.5, **kwargs)
 
 
+def write_to_temp(fin):
+    import tempfile
+    tf = tempfile.NamedTemporaryFile(suffix=".cbfdump.cbf", delete=False)
+    tf.file.write(fin.read())
+    fin.close()
+    tf.file.close()
+    return tf.name
+
+
 def main():
     oprs = OptionParser(usage=usage, description=description)
     oprs.add_option("-m", "--maskfile",
@@ -76,7 +85,21 @@ def main():
     if opts.maskfile != None:
         mask = read_mask(opts.maskfile)
 
-    fname = args[0]
+    filename = args[0]
+    file_is_temporary = False
+    # FIXME: Use magic to detect file type.
+    if filename.endswith(".bz2"):
+        import bz2
+        fin = bz2.BZ2File(filename, mode='r')
+        fname = write_to_temp(fin)
+        file_is_temporary = True
+    elif filename.endswith(".gz"):
+        import gzip
+        fin = gzip.GzipFile(filename, mode='r')
+        fname = write_to_temp(fin)
+        file_is_temporary = True
+    else:
+        fname = filename
 
     h = cbf.CBF()
     h.read_file(fname)
