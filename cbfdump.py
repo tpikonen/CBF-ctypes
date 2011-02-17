@@ -20,6 +20,7 @@ import cbf, re, sys
 import numpy as np
 import matplotlib.pylab as plt
 from optparse import OptionParser
+from xformats.detformats import write_pnglog
 
 description="Show information about a CBF file"
 
@@ -69,6 +70,9 @@ def main():
         action="store", type="string", dest="maskfile", default=None)
     oprs.add_option("-c", "--cross",
         action="store", type="string", dest="center_str", default=None)
+    oprs.add_option("-o", "--output",
+        action="store", type="string", dest="pngfile", default=None,
+        help="Write the logarithm of the frame to a PNG file.")
     (opts, args) = oprs.parse_args()
     if(len(args) < 1):
         oprs.error("Input file argument required")
@@ -151,9 +155,12 @@ def main():
                         plt.show()
                     elif len(d.shape) == 2:
                         if mask is not None:
-                            plt.imshow(np.log(np.abs(d*mask)+1), interpolation='nearest')
+                            logim = np.log(np.abs(d*mask)+1)
                         else:
-                            plt.imshow(np.log(np.abs(d)+1), interpolation='nearest')
+                            logim = np.log(np.abs(d)+1)
+                        if opts.pngfile is not None:
+                            write_pnglog(logim, opts.pngfile)
+                        plt.imshow(logim, interpolation='nearest')
                         if center is not None:
                             mark_cross(center, color='white')
                         plt.show()
