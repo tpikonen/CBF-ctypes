@@ -88,7 +88,11 @@ c_fclose.argtypes = [FILE_ptr]
 class HandleStruct(Structure): pass # cbf_handle_struct
 Handle = POINTER(HandleStruct) # cbf_handle
 
-lib = cdll.LoadLibrary("libcbf.so.0")
+try:
+    lib = cdll.LoadLibrary("libcbf.so.0")
+except OSError:
+    lib = cdll.LoadLibrary("/sls/XBL/data/ikonen/cbflib/CBFlib-0.8.1.1/solib/libcbf.so")
+
 #lib.cbf_get_arrayparameters_wdims.restype = c_int
 #lib.cbf_get_arrayparameters_wdims.argtypes = [
 #    Handle,
